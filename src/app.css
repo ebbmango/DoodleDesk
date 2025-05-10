@@ -1,0 +1,11 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@theme {
+	--color-sunblush: #ffbb5c;
+	--color-autumn: #ff9b50;
+	--color-festival: #e25e3e;
+	--color-saffron: #c63d2f;
+	--color-whitesmoke: #f6f4f3;
+	--color-jet: #333232;
+}
