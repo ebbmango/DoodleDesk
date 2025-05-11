@@ -1,13 +1,163 @@
-<script>
+<!-- todo: validate email format -->
+
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import gsap from 'gsap';
+	import { SplitText } from 'gsap/SplitText';
+
+	import PasswordRequirement from '$lib/components/PasswordRequirement.svelte';
+
+	// UI state
 	let showPassword = false;
+	let isSignUpMode = false;
+	let hasInteracted = false;
+	let initialized = false;
+
+	// DOM refs
+	let cardRef: HTMLDivElement;
+	let loginText: HTMLParagraphElement;
+	let signupText: HTMLParagraphElement;
+
+	// Password state
+	let password = '';
+	let confirm = '';
+
+	// GSAP split text instances
+	let login: SplitText;
+	let signup: SplitText;
+
+	// Animation constants
+	const CARD_WIDTH_LOGIN = 400;
+	const CARD_WIDTH_SIGNUP = 640;
+	const SIGNUP_TEXT_INITIAL_OFFSET = 62;
+	const SIGNUP_TEXT_TARGET_Y = -38;
+	const LOGIN_TEXT_EXIT_Y = -50;
+	const SIGNUP_TEXT_RETURN_Y = 12;
+
+	// Password validation rules
+	$: isLongEnough = password.length >= 8;
+	$: hasUpper = /[A-Z]/.test(password);
+	$: hasLower = /[a-z]/.test(password);
+	$: hasNumber = /\d/.test(password);
+	$: hasSpecial = /[^A-Za-z0-9]/.test(password);
+	$: matches = password === confirm;
+
+	$: isValid =
+        !isSignUpMode ||
+		password.length >= 8 &&
+		/[A-Z]/.test(password) &&
+		/[a-z]/.test(password) &&
+		/\d/.test(password) &&
+		/[^A-Za-z0-9]/.test(password) &&
+		password === confirm;
+
+	function setMode() {
+		isSignUpMode = !isSignUpMode;
+		hasInteracted ||= true;
+	}
+
+	let canToggleMode = true;
+
+	let modeToggleWrapper: HTMLDivElement;
+
+	function throttledSetMode() {
+		if (!canToggleMode) return;
+		canToggleMode = false;
+
+		// Animate out current text + button
+		gsap.to(modeToggleWrapper, {
+			autoAlpha: 0,
+			duration: 0.2,
+			onComplete: () => {
+				setMode();
+				// Animate in new state
+				gsap.to(modeToggleWrapper, { autoAlpha: 1, duration: 0.4 });
+			}
+		});
+
+		setTimeout(() => {
+			canToggleMode = true;
+		}, 600);
+	}
+
+	function animateWords(target: gsap.TweenTarget, y: number, duration = 0.5) {
+		gsap.to(target, {
+			y,
+			duration,
+			stagger: 0.03,
+			ease: 'power2.out'
+		});
+	}
+
+	function clickPulse(node: HTMLElement) {
+		node.addEventListener('click', () => {
+			gsap.fromTo(
+				node,
+				{ scale: 1 },
+				{ scale: 0.95, duration: 0.1, yoyo: true, repeat: 1, ease: 'power1.out' }
+			);
+		});
+	}
+
+	// Watch for animation triggers
+	$: if (browser && initialized && hasInteracted) {
+		gsap.to(cardRef, {
+			width: isSignUpMode ? CARD_WIDTH_SIGNUP : CARD_WIDTH_LOGIN,
+			duration: 0.6,
+			ease: isSignUpMode ? 'expo.out' : 'expo.out'
+		});
+
+		if (isSignUpMode) {
+			animateWords(login.words, LOGIN_TEXT_EXIT_Y, 0.4);
+			animateWords(signup.words, SIGNUP_TEXT_TARGET_Y, 0.6);
+		} else {
+			animateWords(signup.words, SIGNUP_TEXT_RETURN_Y, 0.4);
+			animateWords(login.words, 0, 0.6);
+		}
+	}
+
+	onMount(() => {
+		if (!browser) return;
+
+		gsap.registerPlugin(SplitText);
+		login = SplitText.create(loginText, { type: 'words' });
+		signup = SplitText.create(signupText, { type: 'words' });
+		gsap.set(signup.words, { y: SIGNUP_TEXT_INITIAL_OFFSET });
+
+		initialized = true;
+	});
 </script>
 
 <div class="relative flex h-screen w-screen items-center justify-center">
 	<div class="">
 		<!-- Shadow -->
 		<div
-			class="bg-autumn absolute z-0 h-100 w-100 translate-x-6 translate-y-6 transform rounded-3xl"
-		></div>
+			bind:this={cardRef}
+			class="bg-autumn absolute z-0 flex h-100 w-100 translate-x-6 translate-y-6 transform flex-col items-end justify-center rounded-3xl pe-6"
+		>
+			<div class="flex -translate-y-3 flex-col gap-5">
+				<div class="ms-2.5 flex flex-col items-start gap-2.5">
+					<PasswordRequirement valid={isLongEnough} text="At least 8 characters" />
+					<PasswordRequirement valid={hasUpper} text="One uppercase letter" />
+					<PasswordRequirement valid={hasLower} text="One lowercase letter" />
+					<PasswordRequirement valid={hasNumber} text="One number" />
+					<PasswordRequirement valid={hasSpecial} text="One special character" />
+					<PasswordRequirement valid={matches} text="Passwords must match" />
+				</div>
+				<div class="flex flex-col items-center gap-0.5">
+					<input
+						bind:value={confirm}
+						type={showPassword ? 'text' : 'password'}
+						name="password"
+						placeholder={showPassword ? 'password' : '•••••••••'}
+						id=""
+						class="bg-sunblush text-saffron placeholder:text-autumn w-55 rounded-xl border-0 focus:ring-0"
+					/>
+					<label for="password" class="text-festival me-2.5">confirm your password</label>
+				</div>
+			</div>
+		</div>
 
 		<!-- Main card -->
 		<div
@@ -15,9 +165,12 @@
 		>
 			<!-- Header -->
 			<div
-				class="bg-whitesmoke text-festival flex h-10 w-90 items-center justify-center gap-1.5 rounded-2xl text-xl"
+				class="bg-whitesmoke text-festival relative flex h-10 w-90 flex-col items-center justify-center gap-1.5 overflow-hidden rounded-2xl text-xl"
 			>
-				<p><strong>Log in</strong> to your account</p>
+				<p bind:this={loginText} class="absolute"><strong>Log in</strong> to your account</p>
+				<p bind:this={signupText} class="absolute -bottom-8">
+					<strong>Sign up</strong> for an account
+				</p>
 			</div>
 
 			<div class="flex justify-end">
@@ -49,7 +202,8 @@
 					<input
 						type={showPassword ? 'text' : 'password'}
 						name="password"
-						placeholder={showPassword ? 'password' : "•••••••••"}
+						bind:value={password}
+						placeholder={showPassword ? 'password' : '•••••••••'}
 						id=""
 						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
@@ -57,6 +211,7 @@
 					<!-- toggle visibility -->
 					<button
 						type="button"
+						use:clickPulse
 						on:click={() => (showPassword = !showPassword)}
 						class="text-festival absolute top-2.5 -right-7"
 						aria-label="Toggle password visibility"
@@ -86,18 +241,27 @@
 				</div>
 				<!-- enter -->
 				<button
+					disabled={!isValid}
 					type="submit"
-					class="bg-festival text-whitesmoke hover:bg-saffron w-30 -translate-y-7 rounded-lg py-1"
+					use:clickPulse
+					class="bg-festival text-whitesmoke border-festival border-2 hover:bg-saffron w-30 -translate-y-7 rounded-lg py-1 disabled:bg-sunblush disabled:border-2 disabled:border-autumn disabled:text-autumn transition-colors duration-200"
 					>Enter</button
 				>
 			</div>
 		</div>
 		<!-- Change form text -->
-		<div class="mt-10 flex items-center justify-center gap-2">
-			<p class="text-festival">Do not have an account yet?</p>
-			<button type="button" class="text-whitesmoke bg-sunblush hover:bg-autumn rounded-md px-4 py-1"
-				>Join</button
+		<div class="mt-10 flex items-center justify-center gap-2" bind:this={modeToggleWrapper}>
+			<p class="text-festival">
+				{isSignUpMode ? 'Already have an account?' : 'Do not have an account yet?'}
+			</p>
+			<button
+				type="button"
+				use:clickPulse
+				on:click={throttledSetMode}
+				class="text-whitesmoke bg-sunblush hover:bg-autumn rounded-md px-4 py-1"
 			>
+				{isSignUpMode ? 'Log In' : 'Join'}
+			</button>
 		</div>
 	</div>
 </div>
