@@ -11,14 +11,13 @@
 
 		<!-- Main card -->
 		<div
-			class="bg-sunblush relative z-10 flex h-100 w-100 flex-col items-center gap-3 rounded-3xl pt-6 justify-between"
+			class="bg-sunblush relative z-10 flex h-100 w-100 flex-col items-center justify-between gap-3 rounded-3xl pt-6"
 		>
 			<!-- Header -->
 			<div
 				class="bg-whitesmoke text-festival flex h-10 w-90 items-center justify-center gap-1.5 rounded-2xl text-xl"
 			>
-				<p class="font-bold">Log in</p>
-				<p>to your account</p>
+				<p><strong>Log in</strong> to your account</p>
 			</div>
 
 			<div class="flex justify-end">
@@ -40,9 +39,9 @@
 					<input
 						type="email"
 						name="email"
-                        placeholder="your@email.com"
+						placeholder="your@email.com"
 						id=""
-						class="bg-whitesmoke text-saffron rounded-xl border-0 focus:ring-0 placeholder:text-gray-400"
+						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
 				</div>
 				<!-- password field -->
@@ -50,12 +49,12 @@
 					<input
 						type={showPassword ? 'text' : 'password'}
 						name="password"
-                        placeholder="p455w0rd"
+						placeholder="p455w0rd"
 						id=""
-						class="bg-whitesmoke text-saffron rounded-xl border-0 focus:ring-0 placeholder:text-gray-400"
+						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
 					<label for="password" class="text-festival me-2.5">password</label>
-                    <!-- toggle visibility -->
+					<!-- toggle visibility -->
 					<button
 						type="button"
 						on:click={() => (showPassword = !showPassword)}
