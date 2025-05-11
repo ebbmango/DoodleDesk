@@ -49,7 +49,7 @@
 					<input
 						type={showPassword ? 'text' : 'password'}
 						name="password"
-						placeholder="p455w0rd"
+						placeholder={showPassword ? 'password' : "•••••••••"}
 						id=""
 						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
