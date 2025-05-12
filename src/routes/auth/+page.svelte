@@ -159,7 +159,12 @@
 	<!-- notification -->
 
 	<!-- login panel -->
-	<div>
+	<div class="mb-10">
+		<div class="gap-2 text-center flex flex-col mb-3 cursor-default">
+			<p class="text-2xl font-jua text-festival opacity">Welcome to</p>
+			<h1 class="font-jua text-6xl text-saffron">DoodleDesk</h1>
+		</div>
+
 		{#if actuallyRenderWarn}
 			<div bind:this={warningRef}>
 				<Warning

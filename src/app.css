@@ -9,3 +9,9 @@
 	--color-whitesmoke: #f6f4f3;
 	--color-jet: #333232;
 }
+
+@layer utilities {
+	.font-jua {
+		font-family: 'Jua', sans-serif;
+	}
+}
