@@ -6,6 +6,7 @@
 	import gsap from 'gsap';
 	import { SplitText } from 'gsap/SplitText';
 
+	import Warning from '$lib/components/AuthWarning.svelte';
 	import PasswordRequirement from '$lib/components/PasswordRequirement.svelte';
 
 	// UI state
@@ -13,9 +14,11 @@
 	let isSignUpMode = false;
 	let hasInteracted = false;
 	let initialized = false;
+	let showWarn = true;
 
 	// DOM refs
 	let cardRef: HTMLDivElement;
+	let warningRef: HTMLDivElement;
 	let loginText: HTMLParagraphElement;
 	let signupText: HTMLParagraphElement;
 
@@ -44,17 +47,19 @@
 	$: matches = password === confirm;
 
 	$: isValid =
-        !isSignUpMode ||
-		password.length >= 8 &&
-		/[A-Z]/.test(password) &&
-		/[a-z]/.test(password) &&
-		/\d/.test(password) &&
-		/[^A-Za-z0-9]/.test(password) &&
-		password === confirm;
+		!isSignUpMode ||
+		(password.length >= 8 &&
+			/[A-Z]/.test(password) &&
+			/[a-z]/.test(password) &&
+			/\d/.test(password) &&
+			/[^A-Za-z0-9]/.test(password) &&
+			password === confirm);
 
 	function setMode() {
 		isSignUpMode = !isSignUpMode;
 		hasInteracted ||= true;
+
+		if (isSignUpMode) showWarn = true;
 	}
 
 	let canToggleMode = true;
@@ -102,10 +107,16 @@
 
 	// Watch for animation triggers
 	$: if (browser && initialized && hasInteracted) {
+		console.log(showWarn);
 		gsap.to(cardRef, {
 			width: isSignUpMode ? CARD_WIDTH_SIGNUP : CARD_WIDTH_LOGIN,
+			duration: 0.6
+		});
+
+		gsap.to(warningRef, {
+			x: showWarn ? -360 : 0,
 			duration: 0.6,
-			ease: isSignUpMode ? 'expo.out' : 'expo.out'
+			ease: showWarn ? 'back.out(1.0)' : 'back.in(1.0)'
 		});
 
 		if (isSignUpMode) {
@@ -130,8 +141,23 @@
 </script>
 
 <div class="relative flex h-screen w-screen items-center justify-center">
-	<div class="">
-		<!-- Shadow -->
+	<!-- notifications panel -->
+
+	<!-- notification -->
+
+	<!-- login panel -->
+	<div>
+		<div bind:this={warningRef}>
+			<Warning
+				onclick={() => {
+					showWarn = false;
+				}}
+				title="Invalid email address"
+				message="We couldn't find an account with that email. Double-check for typos or <strong>sign up instead.</strong>"
+			/>
+		</div>
+
+		<!-- Shadow (confirm password panel) -->
 		<div
 			bind:this={cardRef}
 			class="bg-autumn absolute z-0 flex h-100 w-100 translate-x-6 translate-y-6 transform flex-col items-end justify-center rounded-3xl pe-6"
@@ -158,7 +184,6 @@
 				</div>
 			</div>
 		</div>
-
 		<!-- Main card -->
 		<div
 			class="bg-sunblush relative z-10 flex h-100 w-100 flex-col items-center justify-between gap-3 rounded-3xl pt-6"
@@ -211,7 +236,6 @@
 					<!-- toggle visibility -->
 					<button
 						type="button"
-						use:clickPulse
 						on:click={() => (showPassword = !showPassword)}
 						class="text-festival absolute top-2.5 -right-7"
 						aria-label="Toggle password visibility"
@@ -244,13 +268,16 @@
 					disabled={!isValid}
 					type="submit"
 					use:clickPulse
-					class="bg-festival text-whitesmoke border-festival border-2 hover:bg-saffron w-30 -translate-y-7 rounded-lg py-1 disabled:bg-sunblush disabled:border-2 disabled:border-autumn disabled:text-autumn transition-colors duration-200"
+					class="bg-festival text-whitesmoke border-festival hover:bg-saffron disabled:bg-sunblush disabled:border-autumn disabled:text-autumn w-30 -translate-y-7 rounded-lg border-2 py-1 transition-colors duration-200 disabled:border-2"
 					>Enter</button
 				>
 			</div>
 		</div>
 		<!-- Change form text -->
-		<div class="mt-10 flex items-center justify-center gap-2" bind:this={modeToggleWrapper}>
+		<div
+			class="mt-10 flex translate-x-3 items-center justify-center gap-2"
+			bind:this={modeToggleWrapper}
+		>
 			<p class="text-festival">
 				{isSignUpMode ? 'Already have an account?' : 'Do not have an account yet?'}
 			</p>
@@ -263,5 +290,12 @@
 				{isSignUpMode ? 'Log In' : 'Join'}
 			</button>
 		</div>
+	</div>
+	<div class="absolute bottom-3 mt-4">
+		<p
+			class="text-autumn hover:text-saffron cursor-pointer text-sm duration-150 hover:-translate-y-0.5 hover:scale-110"
+		>
+			Forgot your password?
+		</p>
 	</div>
 </div>
