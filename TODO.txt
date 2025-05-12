@@ -1,0 +1,3 @@
+- Set up backend server
+- Set up authentication
+- Show only the relevant warnings
