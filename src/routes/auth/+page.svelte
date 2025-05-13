@@ -8,7 +8,10 @@
 
 	import Warning from '$lib/components/AuthWarning.svelte';
 	import PasswordRequirement from '$lib/components/PasswordRequirement.svelte';
-	import { scale } from 'svelte/transition';
+
+	import { AUTH_ERRORS } from '$lib/constants/authErrors';
+	const { title, messages } = AUTH_ERRORS.DEFAULT;
+	const segments = messages[3];
 
 	// UI state
 	let showPassword = false;
@@ -23,6 +26,7 @@
 	let warningRef: HTMLDivElement;
 	let loginText: HTMLParagraphElement;
 	let signupText: HTMLParagraphElement;
+	let emailInput: HTMLInputElement;
 
 	// Password state
 	let password = '';
@@ -41,7 +45,7 @@
 	const SIGNUP_TEXT_RETURN_Y = 12;
 	const WARNING_CARD_TARGET_X = -360;
 
-	function dismissWarning() {
+	function dismiss() {
 		showWarn = false;
 		setTimeout(() => {
 			actuallyRenderWarn = false;
@@ -151,6 +155,26 @@
 
 		initialized = true;
 	});
+
+	function handleSubmit(event: SubmitEvent) {
+		console.log(emailInput.validity);
+
+		// if signup:
+		if (isSignUpMode) {
+			emailInput.validity;
+		} else {
+		}
+		// 1. INVALID_EMAIL_FORMAT
+		// 2. EMAIL_EXISTS
+		// if login:
+		// 1. EMAIL_NOT_FOUND
+		// 2. INVALID_PASSWORD
+		// finally:
+		// 1. CONNECTION_FAILED (?)
+		// 2. SERVER_ERROR
+		// 3. TIMEOUT
+		// 4. DEFAULT
+	}
 </script>
 
 <div class="relative flex h-screen w-screen items-center justify-center">
@@ -160,18 +184,14 @@
 
 	<!-- login panel -->
 	<div class="mb-10">
-		<div class="gap-2 text-center flex flex-col mb-3 cursor-default">
-			<p class="text-2xl font-jua text-festival opacity">Welcome to</p>
-			<h1 class="font-jua text-6xl text-saffron">DoodleDesk</h1>
+		<div class="mb-3 flex cursor-default flex-col gap-2 text-center">
+			<p class="font-jua text-festival opacity text-2xl">Welcome to</p>
+			<h1 class="font-jua text-saffron text-6xl">DoodleDesk</h1>
 		</div>
 
 		{#if actuallyRenderWarn}
 			<div bind:this={warningRef}>
-				<Warning
-					onclick={dismissWarning}
-					title="Invalid email address"
-					message="We couldn't find an account with that email. Double-check for typos or <strong>sign up instead.</strong>"
-				/>
+				<Warning {title} {segments} {dismiss} {setMode} {isSignUpMode} />
 			</div>
 		{/if}
 
@@ -228,26 +248,29 @@
 				>
 			</div>
 
-			<form class="flex flex-col gap-4">
+			<form novalidate on:submit={handleSubmit} class="flex flex-col gap-4">
 				<!-- email field -->
 				<div class="flex flex-col gap-0.5">
 					<label for="email" class="text-festival ms-2.5">email</label>
 					<input
-						type="email"
-						name="email"
-						placeholder="your@email.com"
+						required
 						id="email"
+						name="email"
+						type="email"
+						bind:this={emailInput}
+						placeholder="your@email.com"
 						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
 				</div>
 				<!-- password field -->
 				<div class="relative flex flex-col items-end gap-0.5">
 					<input
-						type={showPassword ? 'text' : 'password'}
+						required
+						id="password"
 						name="password"
+						type={showPassword ? 'text' : 'password'}
 						bind:value={password}
 						placeholder={showPassword ? 'password' : '•••••••••'}
-						id="password"
 						class="bg-whitesmoke text-saffron rounded-xl border-0 placeholder:text-gray-400 focus:ring-0"
 					/>
 					<label for="password" class="text-festival me-2.5">password</label>
