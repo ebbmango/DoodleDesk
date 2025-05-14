@@ -10,8 +10,8 @@
 	import PasswordRequirement from '$lib/components/PasswordRequirement.svelte';
 
 	import { AUTH_ERRORS } from '$lib/constants/authErrors';
-	const { title, messages } = AUTH_ERRORS.DEFAULT;
-	const segments = messages[3];
+	const { title, messages } = AUTH_ERRORS.INVALID_PASSWORD;
+	const segments = messages[1];
 
 	// UI state
 	let showPassword = false;
