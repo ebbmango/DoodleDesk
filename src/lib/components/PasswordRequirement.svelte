@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { faCheckSquare, faXmarkSquare } from '@fortawesome/pro-solid-svg-icons';
+	import Fa from 'svelte-fa';
+
 	export let text: string;
 	export let valid = false;
 
@@ -13,14 +16,6 @@
 	aria-live="polite"
 	class={`flex items-center gap-2 ${valid ? 'text-saffron' : 'text-festival'}`}
 >
-	<svg
-		class={`${valid ? 'fill-saffron' : 'fill-festival'} h-4 w-4`}
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 448 512"
-		role="img"
-		aria-label={valid ? 'Requirement met' : 'Requirement not met'}
-	>
-		<path d={valid ? checkIcon : uncheckIcon} />
-	</svg>
+	<Fa icon={valid ? faCheckSquare : faXmarkSquare} />
 	<p>{text}</p>
 </div>
