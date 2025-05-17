@@ -9,8 +9,8 @@
 	import gsap from 'gsap';
 	import { SplitText } from 'gsap/SplitText';
 
-	import Warning from '$lib/components/AuthWarning.svelte';
-	import PasswordRequirement from '$lib/components/PasswordRequirement.svelte';
+	import Warning from './Notification.svelte';
+	import Requirement from './Requirement.svelte';
 
 	import { AUTH_ERRORS } from '$lib/constants/authErrors';
 	const { title, messages } = AUTH_ERRORS.INVALID_PASSWORD;
@@ -205,12 +205,12 @@
 		>
 			<div class="flex -translate-y-3 flex-col gap-5">
 				<div class="ms-2.5 flex flex-col items-start gap-2.5">
-					<PasswordRequirement valid={isLongEnough} text="At least 8 characters" />
-					<PasswordRequirement valid={hasUpper} text="One uppercase letter" />
-					<PasswordRequirement valid={hasLower} text="One lowercase letter" />
-					<PasswordRequirement valid={hasNumber} text="One number" />
-					<PasswordRequirement valid={hasSpecial} text="One special character" />
-					<PasswordRequirement valid={matches} text="Passwords must match" />
+					<Requirement valid={isLongEnough} text="At least 8 characters" />
+					<Requirement valid={hasUpper} text="One uppercase letter" />
+					<Requirement valid={hasLower} text="One lowercase letter" />
+					<Requirement valid={hasNumber} text="One number" />
+					<Requirement valid={hasSpecial} text="One special character" />
+					<Requirement valid={matches} text="Passwords must match" />
 				</div>
 				<div class="flex flex-col items-center gap-0.5">
 					<input
@@ -282,7 +282,7 @@
 						aria-label="Toggle password visibility"
 					>
 						<Fa
-							icon={showPassword ? faEyeSlash : faEye }
+							icon={showPassword ? faEyeSlash : faEye}
 							style="width: 20px; height: 20px;"
 							class={`${showPassword ? 'scale-105 hover:scale-120' : 'scale-100 hover:scale-115'} fill-festival hover:fill-saffron duration-100`}
 						/>

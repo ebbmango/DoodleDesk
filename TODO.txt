@@ -1,3 +1,6 @@
 - Set up backend server
 - Set up authentication
 - Show only the relevant warnings
+
+
+Welcome Page: Dynamically resize bottom text to never overflow parent

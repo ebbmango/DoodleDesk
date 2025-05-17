@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
-	import type { MsgSegment } from '../constants/authErrors';
 	import { faTriangleExclamation } from '@fortawesome/pro-solid-svg-icons';
 	let { title, segments, dismiss, setMode, isSignUpMode } = $props();
 </script>
@@ -32,7 +31,7 @@
 	<!-- Body -->
 	<div class="bg-whitesmoke border-festival flex w-70 flex-col gap-1 rounded-bl-4xl px-4 pt-3 pb-4">
 		<p class="text-md text-festival text-center">
-			{#each segments as seg: MsgSegment}
+			{#each segments as seg}
 				{#if seg.type === 'text'}
 					{#if seg.bold}
 						<strong>{seg.content}</strong>

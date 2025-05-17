@@ -10,6 +10,12 @@
 	--color-jet: #333232;
 }
 
+@layer base {
+	html {
+		font-family: 'Inter', sans-serif;
+	}
+}
+
 @layer utilities {
 	.font-jua {
 		font-family: 'Jua', sans-serif;
