@@ -11,6 +11,15 @@
 	import AnimatedText from './AnimatedText.svelte';
 	import UsernameForm from './UsernameForm.svelte';
 
+	import {
+		faCarSide,
+		faCat,
+		faFaceGrin,
+		faStrawberry,
+		faUser
+	} from '@fortawesome/pro-solid-svg-icons';
+	import CategoryButton from './CategoryButton.svelte';
+
 	// Username state
 	let username = '';
 	let prevUsername = '';
@@ -143,6 +152,25 @@
 			scheduleLayoutCheck();
 		}
 	}
+
+	// ICONS:
+
+	let selectedCategory: string | null = null;
+
+	function toggle(cat: string) {
+		selectedCategory =
+			selectedCategory === cat
+				? null // deselect
+				: cat; // select new
+	}
+
+	const categories = [
+		{ icon: faFaceGrin, label: 'emoji' },
+		{ icon: faCat, label: 'animals' },
+		{ icon: faCarSide, label: 'objects' },
+		{ icon: faUser, label: 'users' },
+		{ icon: faStrawberry, label: 'food' }
+	];
 </script>
 
 <div class="relative flex h-screen w-screen flex-col items-center justify-center gap-8">
@@ -160,5 +188,26 @@
 		/>
 	</div>
 
-	<UsernameForm bind:username onSubmit={handleFormSubmit} />
+	<div class="grid grid-cols-5">
+		<!-- CATEGORY MENU -->
+		<div class="flex h-[16rem] w-36 flex-col justify-center gap-2">
+			{#each categories as { icon, label }}
+				<CategoryButton {icon} {label} bind:selectedCategory />
+			{/each}
+		</div>
+		<!-- ICON PICKER -->
+		<div class="col-span-3 flex items-center justify-center">
+			<div class="bg-saffron h-30 w-30 rounded-full"></div>
+		</div>
+		<!-- EMPTY (tr)  -->
+		<div class=""></div>
+		<!-- EMPTY (bl)-->
+		<div class=""></div>
+		<!-- USERNAME FIELD -->
+		<div class="col-span-3">
+			<UsernameForm bind:username onSubmit={handleFormSubmit} />
+		</div>
+		<!-- EMPTY (br) -->
+		<div class=""></div>
+	</div>
 </div>
